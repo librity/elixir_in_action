@@ -54,16 +54,75 @@ KeyValue
 - https://hexdocs.pm/elixir/GenServer.html
 - http://erlang.org/doc/man/gen_server.html
 
-###
+### use vs. import vs. require
+
+Won't compile:
 
 ```elixir
+defmodule ModA do
+  defmacro __using__(_opts) do
+    IO.puts("You are USING ModA")
+  end
 
+  def moda do
+    IO.puts("Inside ModA")
+  end
+end
+
+defmodule ModB do
+  use ModA
+
+  def modb do
+    IO.puts("Inside ModB")
+    # ModA was not imported, this function doesn't exist
+    moda()
+  end
+end
+
+ModA.moda()
+ModB.modb()
 ```
 
-###
+Will compile:
 
 ```elixir
+defmodule ModA do
+  defmacro __using__(_opts) do
+    IO.puts("You are USING ModA")
 
+    quote do
+      import ModA
+    end
+  end
+
+  def moda do
+    IO.puts("Inside ModA")
+  end
+end
+
+defmodule ModB do
+  use ModA
+
+  def modb do
+    IO.puts("Inside ModB")
+    # ModA was imported, this function exist now
+    moda()
+  end
+end
+
+ModA.moda()
+ModB.modb()
+```
+
+- https://stackoverflow.com/questions/28491306/elixir-use-vs-import
+- https://github.com/bitwalker/timex/blob/master/lib/timex.ex
+
+### Name registration
+
+```elixir
+GenServer.start(CallbackModule, init_param, name: :some_name)
+GenServer.call(:some_name, request)
+GenServer.cast(:some_name, request)
 ```
 
 ###
