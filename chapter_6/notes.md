@@ -51,6 +51,8 @@ KeyValue
 ```
 
 - https://hexdocs.pm/elixir/1.6.6/Module.html#__info__/1
+- https://hexdocs.pm/elixir/GenServer.html
+- http://erlang.org/doc/man/gen_server.html
 
 ###
 
