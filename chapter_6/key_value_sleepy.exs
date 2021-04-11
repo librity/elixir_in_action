@@ -8,7 +8,7 @@ defmodule KeyValue.Sleepy do
     yell!(wakeup_chance)
   end
 
-  defp yell!(wakeup_chance) when wakeup_chance < 0.33, do: {:stop, "Server is hungover"}
+  defp yell!(wakeup_chance) when wakeup_chance < 0.33, do: {:stop, :hungover}
   defp yell!(wakeup_chance) when wakeup_chance > 0.33 and wakeup_chance < 0.66, do: :ignore
   defp yell!(_wakeup_chance), do: {:ok, %{}}
 
@@ -24,7 +24,8 @@ defmodule KeyValue.Sleepy do
     back_to_bed_chance = generate_chance()
 
     if back_to_bed_chance < 0.5 do
-      {:stop, "Server went back to bed.", state}
+      IO.puts("Server went back to bed... 😴")
+      {:stop, :back_to_bed, state}
     else
       response
     end
@@ -39,15 +40,15 @@ defmodule KeyValue.Sleepy.Client do
   def wake_up do
     case start do
       {:error, _reason} ->
-        IO.puts("Server opened his eyes...")
+        IO.puts("Server opened his eyes... 🥱")
         wake_up()
 
       :ignore ->
-        IO.puts("Server sat on his bed...")
+        IO.puts("Server sat on his bed... 😪")
         wake_up()
 
       {:ok, _pid} = success ->
-        IO.puts("Server got out of bed!")
+        IO.puts("Server got out of bed! 😫")
         success
     end
   end
