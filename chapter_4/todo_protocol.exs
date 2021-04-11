@@ -25,6 +25,7 @@ defmodule Todo do
     %__MODULE__{todo_list | auto_id: auto_id + 1, entries: new_entries}
   end
 
+  def all(%__MODULE__{entries: entries}), do: Enum.map(entries, fn {_id, entry} -> entry end)
   def by_date(%__MODULE__{} = todo_list, date), do: by_key(todo_list, date, :date)
   def by_id(%__MODULE__{} = todo_list, id), do: by_key(todo_list, id, :id)
   def by_title(%__MODULE__{} = todo_list, title), do: by_key(todo_list, title, :title)
@@ -91,7 +92,7 @@ defimpl Collectable, for: Todo do
   defp into_callback(todo_list, :halt), do: :ok
 end
 
-Todo.FromCsv.import("todo.csv") |> IO.puts()
+Todo.FromCsv.import("todo.csv") |> Todo.all()
 
 entries = [
   %{date: ~D[2018-12-19], title: "Dentist"},

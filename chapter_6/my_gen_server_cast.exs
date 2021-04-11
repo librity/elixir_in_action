@@ -31,19 +31,20 @@ defmodule MyGenServer do
 end
 
 defmodule KeyValue do
-  @impl true
   def init, do: %{}
-  @impl true
+
   def handle_call({:get, key}, state), do: {Map.get(state, key), state}
-  def handle_call(bad_request, state), do: {:bad_request, state}
-  @impl true
+  def handle_call(_bad_request, state), do: {:bad_request, state}
+
   def handle_cast({:put, key, value}, state), do: Map.put(state, key, value)
   def handle_cast(_bad_request, state), do: state
 end
 
 defmodule KeyValue.Client do
   def start, do: MyGenServer.start(KeyValue)
+
   def get(pid, key), do: MyGenServer.call(pid, {:get, key})
+
   def put(pid, key, value), do: MyGenServer.cast(pid, {:put, key, value})
 end
 
