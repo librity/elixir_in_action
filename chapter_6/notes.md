@@ -53,6 +53,7 @@ KeyValue
 - https://hexdocs.pm/elixir/1.6.6/Module.html#__info__/1
 - https://hexdocs.pm/elixir/GenServer.html
 - http://erlang.org/doc/man/gen_server.html
+- https://en.wikipedia.org/wiki/Actor_model
 
 ### use vs. import vs. require
 
@@ -125,8 +126,9 @@ GenServer.call(:some_name, request)
 GenServer.cast(:some_name, request)
 ```
 
-###
+### OTP-compliant processes
 
-```elixir
-
-```
+- https://hexdocs.pm/elixir/Task.html
+- https://hexdocs.pm/elixir/Agent.html
+- https://github.com/elixir-lang/gen_stage
+- https://phoenixframework.org/

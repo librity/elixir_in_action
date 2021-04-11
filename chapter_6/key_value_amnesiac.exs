@@ -3,18 +3,18 @@ defmodule KeyValue.Amnesiac do
 
   @short_term_memory 1000
 
-  @impl true
+  @impl GenServer
   def init(_) do
     :timer.send_interval(@short_term_memory, :cleanup)
 
     {:ok, %{}}
   end
 
-  @impl true
+  @impl GenServer
   def handle_cast({:put, key, value}, state), do: {:noreply, Map.put(state, key, value)}
-  @impl true
+  @impl GenServer
   def handle_call({:get, key}, _caller, state), do: {:reply, Map.get(state, key), state}
-  @impl true
+  @impl GenServer
   def handle_info(:cleanup, state) do
     pid = inspect(self())
     IO.puts("Forgetting #{pid}'s KeyValue state:")

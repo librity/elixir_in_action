@@ -1,7 +1,7 @@
 defmodule KeyValue.Sleepy do
   use GenServer
 
-  @impl true
+  @impl GenServer
   def init(_) do
     wakeup_chance = generate_chance()
 
@@ -12,11 +12,11 @@ defmodule KeyValue.Sleepy do
   defp yell!(wakeup_chance) when wakeup_chance > 0.33 and wakeup_chance < 0.66, do: :ignore
   defp yell!(_wakeup_chance), do: {:ok, %{}}
 
-  @impl true
+  @impl GenServer
   def handle_cast({:put, key, value}, state),
     do: respond_or_sleep!({:noreply, Map.put(state, key, value)}, state)
 
-  @impl true
+  @impl GenServer
   def handle_call({:get, key}, _caller, state),
     do: respond_or_sleep!({:reply, Map.get(state, key), state}, state)
 

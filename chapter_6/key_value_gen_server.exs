@@ -1,11 +1,11 @@
 defmodule KeyValue do
   use GenServer
 
-  @impl true
+  @impl GenServer
   def init(_), do: {:ok, %{}}
-  @impl true
+  @impl GenServer
   def handle_cast({:put, key, value}, state), do: {:noreply, Map.put(state, key, value)}
-  @impl true
+  @impl GenServer
   def handle_call({:get, key}, _caller, state), do: {:reply, Map.get(state, key), state}
 end
 

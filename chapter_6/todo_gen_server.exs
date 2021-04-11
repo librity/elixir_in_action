@@ -64,75 +64,53 @@ defmodule Todo do
     do: put_in(todo_list.entries, Map.delete(todo_list.entries, entry_id))
 end
 
-defmodule MyGenServer do
-  def start(callback_module) do
-    spawn(fn ->
-      initial_state = callback_module.init()
-      loop(callback_module, initial_state)
-    end)
-  end
-
-  def call(pid, request) do
-    send(pid, {:call, request, self()})
-
-    receive do
-      {:response, response} -> response
-    end
-  end
-
-  def cast(pid, request), do: send(pid, {:cast, request})
-
-  defp loop(callback_module, state) do
-    receive do
-      {:call, request, caller} ->
-        {response, new_state} = callback_module.handle_call(request, state)
-        send(caller, {:response, response})
-        loop(callback_module, new_state)
-
-      {:cast, request} ->
-        new_state = callback_module.handle_cast(request, state)
-        loop(callback_module, new_state)
-    end
-  end
-end
-
 defmodule Todo.Server do
-  def init, do: Todo.new()
+  use GenServer
 
-  def handle_call({:all}, todo), do: {Todo.all(todo), todo}
-  def handle_call({:by_date, date}, todo), do: {Todo.by_date(todo, date), todo}
-  def handle_call({:by_title, title}, todo), do: {Todo.by_title(todo, title), todo}
-  def handle_call({:by_id, id}, todo), do: {Todo.by_id(todo, id), todo}
-  def handle_call(_bad_request, todo), do: {:bad_request, todo}
+  @impl GenServer
+  def init(_), do: {:ok, Todo.new()}
 
-  def handle_cast({:add_entry, entry}, todo), do: Todo.add_entry(todo, entry)
-  def handle_cast({:update_entry, entry}, todo), do: Todo.update_entry(todo, entry)
+  @impl GenServer
+  def handle_call({:all}, _caller, todo), do: {:reply, Todo.all(todo), todo}
+  def handle_call({:by_date, date}, _caller, todo), do: {:reply, Todo.by_date(todo, date), todo}
+
+  def handle_call({:by_title, title}, _caller, todo),
+    do: {:reply, Todo.by_title(todo, title), todo}
+
+  def handle_call({:by_id, id}, _caller, todo), do: {:reply, Todo.by_id(todo, id), todo}
+  def handle_call(_bad_request, _caller, todo), do: {:reply, :bad_request, todo}
+
+  @impl GenServer
+  def handle_cast({:add_entry, entry}, todo), do: {:noreply, Todo.add_entry(todo, entry)}
+  def handle_cast({:update_entry, entry}, todo), do: {:noreply, Todo.update_entry(todo, entry)}
 
   def handle_cast({:update_entry, entry_id, updater_fun}, todo),
-    do: Todo.update_entry(todo, entry_id, updater_fun)
+    do: {:noreply, Todo.update_entry(todo, entry_id, updater_fun)}
 
-  def handle_cast({:delete_entry, entry_id}, todo), do: Todo.delete_entry(todo, entry_id)
-  def handle_cast(_bad_request, todo), do: todo
+  def handle_cast({:delete_entry, entry_id}, todo),
+    do: {:noreply, Todo.delete_entry(todo, entry_id)}
+
+  def handle_cast(_bad_request, todo), do: {:noreply, todo}
 end
 
 defmodule Todo.Server.Client do
-  def start, do: MyGenServer.start(Todo.Server)
+  def start, do: GenServer.start(Todo.Server, nil)
 
-  def all(pid), do: MyGenServer.call(pid, {:all})
-  def by_date(pid, date), do: MyGenServer.call(pid, {:by_date, date})
-  def by_title(pid, title), do: MyGenServer.call(pid, {:by_title, title})
-  def by_id(pid, id), do: MyGenServer.call(pid, {:by_id, id})
+  def all(pid), do: GenServer.call(pid, {:all})
+  def by_date(pid, date), do: GenServer.call(pid, {:by_date, date})
+  def by_title(pid, title), do: GenServer.call(pid, {:by_title, title})
+  def by_id(pid, id), do: GenServer.call(pid, {:by_id, id})
 
-  def add_entry(pid, entry), do: MyGenServer.cast(pid, {:add_entry, entry})
-  def update_entry(pid, entry), do: MyGenServer.cast(pid, {:update_entry, entry})
+  def add_entry(pid, entry), do: GenServer.cast(pid, {:add_entry, entry})
+  def update_entry(pid, entry), do: GenServer.cast(pid, {:update_entry, entry})
 
   def update_entry(pid, entry_id, updater_fun),
-    do: MyGenServer.cast(pid, {:update_entry, entry_id, updater_fun})
+    do: GenServer.cast(pid, {:update_entry, entry_id, updater_fun})
 
-  def delete_entry(pid, entry_id), do: MyGenServer.cast(pid, {:delete_entry, entry_id})
+  def delete_entry(pid, entry_id), do: GenServer.cast(pid, {:delete_entry, entry_id})
 end
 
-pid = Todo.Server.Client.start()
+{:ok, pid} = Todo.Server.Client.start()
 Todo.Server.Client.add_entry(pid, %{date: ~D[2018-12-19], title: "Dentist"})
 Todo.Server.Client.add_entry(pid, %{date: ~D[2018-12-20], title: "Shopping"})
 Todo.Server.Client.add_entry(pid, %{date: ~D[2018-12-19], title: "Movies"})
@@ -158,3 +136,47 @@ Todo.Server.Client.all(pid)
 Todo.Server.Client.delete_entry(pid, 1)
 Todo.Server.Client.delete_entry(pid, 8)
 Todo.Server.Client.all(pid)
+
+defmodule Todo.Server.Registered do
+  def start, do: GenServer.start(Todo.Server, nil, name: __MODULE__)
+
+  def all(), do: GenServer.call(__MODULE__, {:all})
+  def by_date(date), do: GenServer.call(__MODULE__, {:by_date, date})
+  def by_title(title), do: GenServer.call(__MODULE__, {:by_title, title})
+  def by_id(id), do: GenServer.call(__MODULE__, {:by_id, id})
+
+  def add_entry(entry), do: GenServer.cast(__MODULE__, {:add_entry, entry})
+  def update_entry(entry), do: GenServer.cast(__MODULE__, {:update_entry, entry})
+
+  def update_entry(entry_id, updater_fun),
+    do: GenServer.cast(__MODULE__, {:update_entry, entry_id, updater_fun})
+
+  def delete_entry(entry_id), do: GenServer.cast(__MODULE__, {:delete_entry, entry_id})
+end
+
+Todo.Server.Registered.start()
+Todo.Server.Registered.add_entry(%{date: ~D[2018-12-19], title: "Dentist"})
+Todo.Server.Registered.add_entry(%{date: ~D[2018-12-20], title: "Shopping"})
+Todo.Server.Registered.add_entry(%{date: ~D[2018-12-19], title: "Movies"})
+Todo.Server.Registered.all()
+Todo.Server.Registered.by_date(~D[2018-12-19])
+
+Todo.Server.Registered.by_date(~D[2018-12-19])
+Todo.Server.Registered.by_date(~D[2018-12-18])
+
+Todo.Server.Registered.by_title("Movies")
+
+Todo.Server.Registered.by_id(2)
+
+Todo.Server.Registered.update_entry(1, &Map.put(&1, :date, ~D[2018-12-20]))
+Todo.Server.Registered.update_entry(1, &Map.put(&1, :title, "Zoo"))
+Todo.Server.Registered.update_entry(8, &Map.put(&1, :title, "Zoo"))
+Todo.Server.Registered.all()
+
+Todo.Server.Registered.update_entry(Todo.Entry.new(1, ~D[2021-12-20], "Rock climbing"))
+Todo.Server.Registered.update_entry(Todo.Entry.new(8, ~D[2021-12-20], "Rock climbing"))
+Todo.Server.Registered.all()
+
+Todo.Server.Registered.delete_entry(1)
+Todo.Server.Registered.delete_entry(8)
+Todo.Server.Registered.all()
