@@ -18,10 +18,6 @@ mix test
 
 ### Encoding erlang terms
 
-```elixir
-
-```
-
 - `:erlang.term_to_binary/1`
 - `:erlang.binary_to _term/1`
 

@@ -2,9 +2,14 @@ defmodule Todo.Cache do
   use GenServer
 
   alias Todo.Server.Client, as: TodoListClient
+  alias Todo.Database.Client, as: DatabaseClient
 
   @impl GenServer
-  def init(_), do: {:ok, %{}}
+  def init(_) do
+    DatabaseClient.start()
+
+    {:ok, %{}}
+  end
 
   @impl GenServer
   def handle_call({:server_process, todo_list_name}, _, todo_servers) do
