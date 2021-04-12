@@ -29,9 +29,13 @@
           "apps/*/lib/",
           "apps/*/src/",
           "apps/*/test/",
-          "apps/*/web/",
-          "elixir_in_action/",
-          "."
+          "apps/*/web/"
+          "chapter_2",
+          "chapter_3",
+          "chapter_4",
+          "chapter_5",
+          "chapter_6",
+          "templates"
         ],
         excluded: [~r"/_build/", ~r"/deps/", ~r"/node_modules/"]
       },
