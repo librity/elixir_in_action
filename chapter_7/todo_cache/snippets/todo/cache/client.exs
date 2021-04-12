@@ -11,7 +11,7 @@ alices_list = Todo.Cache.Client.server_process(cache, "Alice's list")
 Todo.Server.Client.entries(alices_list, ~D[2018-12-19])
 
 # Count processes
-{:ok, cache} = Todo.Cache.start()
+{:ok, cache} = Todo.Cache.Client.start()
 :erlang.system_info(:process_count)
 
 Enum.each(1..100_000, fn index ->

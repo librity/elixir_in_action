@@ -9,6 +9,7 @@ defmodule Todo.Server do
   @impl GenServer
   def handle_call({:all}, _caller, todo), do: {:reply, List.all(todo), todo}
   def handle_call({:by_date, date}, _caller, todo), do: {:reply, List.by_date(todo, date), todo}
+  def handle_call({:entries, date}, _caller, todo), do: {:reply, List.entries(todo, date), todo}
 
   def handle_call({:by_title, title}, _caller, todo),
     do: {:reply, List.by_title(todo, title), todo}

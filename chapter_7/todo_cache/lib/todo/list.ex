@@ -3,7 +3,9 @@ defmodule Todo.List do
 
   defstruct auto_id: 1, entries: %{}
 
-  def new, do: %__MODULE__{}
+  def new(entries \\ []), do: Enum.reduce(entries, %__MODULE__{}, &add_entry(&2, &1))
+
+  def size(%__MODULE__{entries: entries}), do: Map.size(entries)
 
   def add_entry(
         %__MODULE__{auto_id: auto_id, entries: old_entries} = todo_list,
@@ -16,6 +18,7 @@ defmodule Todo.List do
   end
 
   def all(%__MODULE__{entries: entries}), do: Enum.map(entries, fn {_id, entry} -> entry end)
+  def entries(todo_list, date), do: by_date(todo_list, date)
   def by_date(%__MODULE__{} = todo_list, date), do: by_key(todo_list, date, :date)
   def by_id(%__MODULE__{} = todo_list, id), do: by_key(todo_list, id, :id)
   def by_title(%__MODULE__{} = todo_list, title), do: by_key(todo_list, title, :title)

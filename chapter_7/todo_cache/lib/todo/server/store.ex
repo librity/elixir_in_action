@@ -3,7 +3,7 @@ defmodule Todo.Server.Store do
 
   def all(), do: GenServer.call(__MODULE__, {:all})
   def by_date(date), do: GenServer.call(__MODULE__, {:by_date, date})
-  def entries(date), do: by_date(date)
+  def entries(date), do: GenServer.call(__MODULE__, {:entries, date})
   def by_title(title), do: GenServer.call(__MODULE__, {:by_title, title})
   def by_id(id), do: GenServer.call(__MODULE__, {:by_id, id})
 
