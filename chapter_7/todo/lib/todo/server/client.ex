@@ -3,6 +3,7 @@ defmodule Todo.Server.Client do
 
   def all(pid), do: GenServer.call(pid, {:all})
   def by_date(pid, date), do: GenServer.call(pid, {:by_date, date})
+  def entries(pid, date), do: by_date(pid, date)
   def by_title(pid, title), do: GenServer.call(pid, {:by_title, title})
   def by_id(pid, id), do: GenServer.call(pid, {:by_id, id})
 

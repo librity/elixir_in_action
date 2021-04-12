@@ -17,8 +17,8 @@ defmodule KeyValue.Amnesiac do
   @impl GenServer
   def handle_info(:cleanup, state) do
     pid = inspect(self())
-    IO.puts("Forgetting #{pid}'s KeyValue state:")
-    IO.inspect(state)
+    state = inspect(state)
+    IO.puts("Forgetting #{pid}'s KeyValue state: #{state}")
 
     {:noreply, %{}}
   end

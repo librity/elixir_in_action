@@ -1,5 +1,9 @@
 Todo.Server.Store.start()
 Todo.Server.Store.add_entry(%{date: ~D[2018-12-19], title: "Dentist"})
+Todo.Server.Store.entries(~D[2018-12-19])
+
+Todo.Server.Store.start()
+Todo.Server.Store.add_entry(%{date: ~D[2018-12-19], title: "Dentist"})
 Todo.Server.Store.add_entry(%{date: ~D[2018-12-20], title: "Shopping"})
 Todo.Server.Store.add_entry(%{date: ~D[2018-12-19], title: "Movies"})
 Todo.Server.Store.all()

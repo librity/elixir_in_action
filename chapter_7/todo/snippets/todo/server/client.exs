@@ -1,3 +1,7 @@
+{:ok, todo_server} = Todo.Server.Client.start()
+Todo.Server.Client.add_entry(todo_server, %{date: ~D[2018-12-19], title: "Dentist"})
+Todo.Server.Client.entries(todo_server, ~D[2018-12-19])
+
 {:ok, pid} = Todo.Server.Client.start()
 Todo.Server.Client.add_entry(pid, %{date: ~D[2018-12-19], title: "Dentist"})
 Todo.Server.Client.add_entry(pid, %{date: ~D[2018-12-20], title: "Shopping"})
