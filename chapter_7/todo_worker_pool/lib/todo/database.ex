@@ -12,9 +12,7 @@ defmodule Todo.Database do
 
   @impl GenServer
   def handle_cast({:store, key, data}, nil) do
-    key
-    |> file_name()
-    |> File.write!(:erlang.term_to_binary(data))
+    spawn(fn -> key |> file_name() |> File.write!(:erlang.term_to_binary(data)) end)
 
     {:noreply, nil}
   end
@@ -22,14 +20,18 @@ defmodule Todo.Database do
   def handle_cast(_bad_request, nil), do: {:noreply, nil}
 
   @impl GenServer
-  def handle_call({:get, key}, _caller, nil) do
-    data =
-      case key |> file_name() |> File.read() do
-        {:ok, contents} -> :erlang.binary_to_term(contents)
-        _ -> nil
-      end
+  def handle_call({:get, key}, caller, nil) do
+    spawn(fn ->
+      data =
+        case key |> file_name() |> File.read() do
+          {:ok, contents} -> :erlang.binary_to_term(contents)
+          _ -> nil
+        end
 
-    {:reply, data, nil}
+      GenServer.reply(caller, data)
+    end)
+
+    {:noreply, nil}
   end
 
   def handle_call(_bad_request, _caller, nil), do: {:reply, :bad_request, nil}

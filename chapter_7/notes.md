@@ -30,11 +30,10 @@ mix test
 - `:erlang.term_to_binary/1`
 - `:erlang.binary_to_term/1`
 
-###
+### Worker pools and Databases
 
-```elixir
-
-```
+- https://github.com/devinus/poolboy
+- https://github.com/elixir-ecto/ecto
 
 ###
 
