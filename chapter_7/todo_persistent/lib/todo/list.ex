@@ -1,11 +1,14 @@
 defmodule Todo.List do
   alias Todo.Entry
 
-  defstruct auto_id: 1, entries: %{}
+  defstruct name: nil, auto_id: 1, entries: %{}
 
-  def new(entries \\ []), do: Enum.reduce(entries, %__MODULE__{}, &add_entry(&2, &1))
+  def new(entries \\ []), do: initialize(%__MODULE__{}, entries)
+  def new(entries, name), do: initialize(%__MODULE__{name: name}, entries)
 
-  def size(%__MODULE__{entries: entries}), do: Map.size(entries)
+  defp initialize(empty_list, entries), do: Enum.reduce(entries, empty_list, &add_entry(&2, &1))
+
+  def size(%__MODULE__{entries: entries}), do: map_size(entries)
 
   def add_entry(
         %__MODULE__{auto_id: auto_id, entries: old_entries} = todo_list,

@@ -2,9 +2,10 @@ defmodule Todo.Server do
   use GenServer
 
   alias Todo.List
+  alias Todo.Database.Client, as: DatabaseClient
 
   @impl GenServer
-  def init(_), do: {:ok, List.new()}
+  def init(list_name), do: {:ok, List.new([], list_name)}
 
   @impl GenServer
   def handle_call({:all}, _caller, todo), do: {:reply, List.all(todo), todo}
@@ -18,14 +19,20 @@ defmodule Todo.Server do
   def handle_call(_bad_request, _caller, todo), do: {:reply, :bad_request, todo}
 
   @impl GenServer
-  def handle_cast({:add_entry, entry}, todo), do: {:noreply, List.add_entry(todo, entry)}
-  def handle_cast({:update_entry, entry}, todo), do: {:noreply, List.update_entry(todo, entry)}
+  def handle_cast({:add_entry, entry}, todo), do: List.add_entry(todo, entry) |> persist!()
+  def handle_cast({:update_entry, entry}, todo), do: List.update_entry(todo, entry) |> persist!()
 
   def handle_cast({:update_entry, entry_id, updater_fun}, todo),
-    do: {:noreply, List.update_entry(todo, entry_id, updater_fun)}
+    do: List.update_entry(todo, entry_id, updater_fun) |> persist!()
 
   def handle_cast({:delete_entry, entry_id}, todo),
-    do: {:noreply, List.delete_entry(todo, entry_id)}
+    do: List.delete_entry(todo, entry_id) |> persist!()
 
   def handle_cast(_bad_request, todo), do: {:noreply, todo}
+
+  defp persist!(%List{name: name} = todo) do
+    DatabaseClient.store(name, todo)
+
+    {:noreply, todo}
+  end
 end
