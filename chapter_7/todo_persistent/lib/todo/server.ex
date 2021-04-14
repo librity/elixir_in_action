@@ -5,7 +5,7 @@ defmodule Todo.Server do
   alias Todo.Database.Client, as: DatabaseClient
 
   @impl GenServer
-  def init(list_name), do: {:ok, List.new([], list_name)}
+  def init(name), do: {:ok, DatabaseClient.get(name) || List.new([], name)}
 
   @impl GenServer
   def handle_call({:all}, _caller, todo), do: {:reply, List.all(todo), todo}

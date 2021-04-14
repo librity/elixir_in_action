@@ -1,5 +1,5 @@
 defmodule Todo.Server.Client do
-  def start(list_name), do: GenServer.start(Todo.Server, list_name)
+  def start(name), do: GenServer.start(Todo.Server, name)
 
   def all(pid), do: GenServer.call(pid, {:all})
   def by_date(pid, date), do: GenServer.call(pid, {:by_date, date})
