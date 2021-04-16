@@ -1,40 +1,32 @@
 defmodule Todo.Database do
   use GenServer
 
+  alias Todo.Database.Worker.Client, as: WorkerClient
+
   @db_folder "./persist"
+  @pool_size 3
 
   @impl GenServer
   def init(_) do
     File.mkdir_p!(@db_folder)
 
-    {:ok, nil}
+    {:ok, start_workers!()}
   end
 
   @impl GenServer
-  def handle_cast({:store, key, data}, nil) do
-    spawn(fn -> key |> file_name() |> File.write!(:erlang.term_to_binary(data)) end)
+  def handle_call({:choose_worker, key}, _, workers) do
+    index = :erlang.phash2(key, @pool_size)
 
-    {:noreply, nil}
+    {:reply, Map.get(workers, index), workers}
   end
 
-  def handle_cast(_bad_request, nil), do: {:noreply, nil}
+  def handle_call(_bad_request, _caller, workers), do: {:reply, :bad_request, workers}
 
-  @impl GenServer
-  def handle_call({:get, key}, caller, nil) do
-    spawn(fn ->
-      data =
-        case key |> file_name() |> File.read() do
-          {:ok, contents} -> :erlang.binary_to_term(contents)
-          _ -> nil
-        end
+  defp start_workers!() do
+    for index <- 1..3, into: %{} do
+      {:ok, pid} = WorkerClient.start(@db_folder)
 
-      GenServer.reply(caller, data)
-    end)
-
-    {:noreply, nil}
+      {index - 1, pid}
+    end
   end
-
-  def handle_call(_bad_request, _caller, nil), do: {:reply, :bad_request, nil}
-
-  defp file_name(key), do: Path.join(@db_folder, to_string(key))
 end
