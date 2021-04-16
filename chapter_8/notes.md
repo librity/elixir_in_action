@@ -179,10 +179,18 @@ end
 ### Supervisors
 
 ```elixir
+Supervisor.start_link(
+  [%{id: Todo.Cache, start: {Todo.Cache, :start_link, [nil]}}],
+  strategy: :one_for_one
+)
 
+Supervisor.start_link([{Todo.Cache, nil}], strategy: :one_for_one)
+Supervisor.start_link([Todo.Cache], strategy: :one_for_one)
+Todo.Cache.child_spec(nil)
 ```
 
-- https://hexdocs.pm/elixir/Supervisor.html
+- https://hexdocs.pm/elixir/Supervisor.html#module-child-specification
+- https://hexdocs.pm/elixir/GenServer.html#module-use-genserver-and-callbacks
 
 ###
 
