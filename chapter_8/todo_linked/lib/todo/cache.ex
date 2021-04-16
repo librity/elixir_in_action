@@ -1,7 +1,7 @@
 defmodule Todo.Cache do
   use GenServer
 
-  alias Todo.Server.Client, as: TodoListClient
+  alias Todo.Server.Client, as: ServerClient
   alias Todo.Database.Client, as: DatabaseClient
 
   def start_link(_) do
@@ -12,7 +12,7 @@ defmodule Todo.Cache do
 
   @impl GenServer
   def init(_) do
-    DatabaseClient.start()
+    DatabaseClient.start_link()
 
     {:ok, %{}}
   end
@@ -28,7 +28,7 @@ defmodule Todo.Cache do
   def handle_call(_bad_request, _caller, todo_servers), do: {:reply, :bad_request, todo_servers}
 
   defp spawn_server(todo_servers, list_name) do
-    {:ok, new_server} = TodoListClient.start(list_name)
+    {:ok, new_server} = ServerClient.start_link(list_name)
 
     {:reply, new_server, Map.put(todo_servers, list_name, new_server)}
   end

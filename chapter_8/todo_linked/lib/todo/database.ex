@@ -6,6 +6,12 @@ defmodule Todo.Database do
   @db_folder "./persist"
   @pool_size 3
 
+  def start_link(_) do
+    IO.puts("Starting todo database.")
+
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
+  end
+
   @impl GenServer
   def init(_) do
     File.mkdir_p!(@db_folder)
@@ -25,7 +31,7 @@ defmodule Todo.Database do
   defp start_workers!() do
     for index <- 1..@pool_size, into: %{} do
       zero_index = index - 1
-      {:ok, pid} = WorkerClient.start(@db_folder, zero_index)
+      {:ok, pid} = WorkerClient.start_link({@db_folder, zero_index})
 
       {zero_index, pid}
     end

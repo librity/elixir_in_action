@@ -4,6 +4,12 @@ defmodule Todo.Server do
   alias Todo.List
   alias Todo.Database.Client, as: DatabaseClient
 
+  def start_link(name) do
+    IO.puts("Starting todo list '#{name}' server.")
+
+    GenServer.start_link(Todo.Server, name)
+  end
+
   @impl GenServer
   def init(name), do: {:ok, DatabaseClient.get(name) || List.new([], name)}
 

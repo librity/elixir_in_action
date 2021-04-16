@@ -1,9 +1,7 @@
 defmodule Todo.Database.Worker.Client do
-  def start(db_folder, index) do
-    IO.puts("Starting todo database worker ##{index}.")
+  alias Todo.Database.Worker
 
-    GenServer.start(Todo.Database.Worker, db_folder)
-  end
+  defdelegate start_link(params), to: Worker
 
   def store(pid, key, data), do: GenServer.cast(pid, {:store, key, data})
 

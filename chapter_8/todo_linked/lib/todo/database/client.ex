@@ -1,11 +1,8 @@
 defmodule Todo.Database.Client do
+  alias Todo.Database
   alias Todo.Database.Worker.Client, as: WorkerClient
 
-  def start do
-    IO.puts("Starting todo database.")
-
-    GenServer.start(Todo.Database, nil, name: __MODULE__)
-  end
+  defdelegate start_link(params \\ nil), to: Database
 
   def store(key, data) do
     key
@@ -19,5 +16,5 @@ defmodule Todo.Database.Client do
     |> WorkerClient.get(key)
   end
 
-  defp choose_worker(key), do: GenServer.call(__MODULE__, {:choose_worker, key})
+  defp choose_worker(key), do: GenServer.call(Database, {:choose_worker, key})
 end
