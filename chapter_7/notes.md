@@ -34,15 +34,3 @@ mix test
 
 - https://github.com/devinus/poolboy
 - https://github.com/elixir-ecto/ecto
-
-###
-
-```elixir
-
-```
-
-###
-
-```elixir
-
-```
