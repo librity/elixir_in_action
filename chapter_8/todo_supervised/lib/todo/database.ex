@@ -23,10 +23,11 @@ defmodule Todo.Database do
   def handle_call(_bad_request, _caller, workers), do: {:reply, :bad_request, workers}
 
   defp start_workers!() do
-    for index <- 1..3, into: %{} do
-      {:ok, pid} = WorkerClient.start(@db_folder)
+    for index <- 1..@pool_size, into: %{} do
+      zero_index = index - 1
+      {:ok, pid} = WorkerClient.start(@db_folder, zero_index)
 
-      {index - 1, pid}
+      {zero_index, pid}
     end
   end
 end

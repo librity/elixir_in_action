@@ -1,7 +1,11 @@
 defmodule Todo.Database.Client do
   alias Todo.Database.Worker.Client, as: WorkerClient
 
-  def start, do: GenServer.start(Todo.Database, nil, name: __MODULE__)
+  def start do
+    IO.puts("Starting todo database.")
+
+    GenServer.start(Todo.Database, nil, name: __MODULE__)
+  end
 
   def store(key, data) do
     key
