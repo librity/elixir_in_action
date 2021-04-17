@@ -1,4 +1,6 @@
 # mix run -e "Bench.run(KeyValue)"
+# mix run -e "Bench.run(KeyValue, concurrency: 1000)"
+# mix run -e "Bench.run(KeyValue, concurrency: 1000, num_updates: 100)"
 
 defmodule KeyValue do
   use GenServer

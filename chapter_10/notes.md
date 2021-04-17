@@ -75,8 +75,99 @@ Agent.get(counter, fn count -> count end)
 ### Erlang Term Storage tables
 
 ```elixir
+default_options = [
+  :set,
+  :protected,
+  {:keypos, 1},
+  {:heir, :none},
+  {:write_concurrency, false},
+  {:read_concurrency, false},
+  {:decentralized_counters, false}
+]
 
+table = :ets.new(:my_table, default_options)
+:ets.insert_new(table, {:garmon, :bozia})
+:ets.insert(table, {:fire, :walk})
+:ets.insert(table, {:fire, :with})
+:ets.insert(table, {:fire, :me})
+:ets.lookup(table, :fire)
+:ets.lookup(table, :garmon)
+
+another_table = :ets.new(:my_table, default_options)
+:ets.insert_new(another_table, {:garmon, :bozia})
+:ets.lookup(table, :garmon)
+:ets.lookup(another_table, :garmon)
+
+:ets.tab2list(table)
+
+:ets.update_element(table, :garmon, {0, :green_formica})
+:ets.lookup(table, :garmon)
+
+:ets.delete(table, :garmon)
+:ets.lookup(table, :garmon)
+
+:ets.new(:my_table, [:named_table])
+:ets.new(:my_table, [:named_table])
+:ets.all()
 ```
+
+- `:ets.update_element/3`
+- `:ets.update_counter/4`
+- `:ets.delete/2`
+- `:ets.first/1`
+- `:ets.next/2`
+- Traversals aren't performant: `:ets.tab2list/1`, `:ets.safe_fixtable/2`
+- [`:set`, `:ordered_set`, `:bag`, `:duplicate_bag`]
+- [`:public`, `:protected`, `:private`]
+- http://erlang.org/doc/man/ets.html
+- http://erlang.org/doc/man/ets.html#insert_new-2
+
+### ETS match patterns
+
+```elixir
+todo_list = :ets.new(:todo_list, [:bag])
+:ets.insert(todo_list, {~D[2020-07-10], "Shopping"})
+:ets.insert(todo_list, {~D[2020-07-10], "Rock climbing"})
+:ets.insert(todo_list, {~D[2020-09-22], "Shopping"})
+:ets.lookup(todo_list, ~D[2020-07-10])
+:ets.match_object(todo_list, {:_, "Shopping"})
+
+:ets.match_object(todo_list, {:"$1", :_})
+:ets.select(todo_list, [
+  {
+    {:"$1", :_},
+    [],
+    [:"$_"]
+  }
+])
+
+:ets.match_object(todo_list, {:"$1", :_})
+:ets.select(todo_list, [
+  {
+    {~D[2020-07-10], :_},
+    [],
+    [:"$_"]
+  }
+])
+
+:ets.match_delete(todo_list, {:_, "Shopping"})
+:ets.tab2list(todo_list)
+```
+
+- More efficient than traversals (doesn't copy the entire list)
+- `:ets.match_object/2`
+- `:ets.match_delete/2`
+- `:ets.match/2`
+- `:ets.select/2`
+- http://erlang.org/doc/man/ets.html#select-2
+- https://github.com/ericmj/ex2ms
+- http://erlang.org/doc/apps/odbc/databases.html
+- https://elixirschool.com/en/lessons/specifics/ets/
+
+### Disk-based Erlang Term Storage (:dets) and Mnesia database
+
+- http://erlang.org/doc/man/dets.html
+- http://erlang.org/doc/apps/mnesia/users_guide.html
 
 ###
 
