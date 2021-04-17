@@ -1,0 +1,41 @@
+{:ok, supervisor_pid} = Todo.System.start_link()
+Supervisor.count_children(supervisor_pid)
+
+bobs_list = Todo.Cache.Client.server_process("bobs_list")
+Todo.Server.Client.add_entry(bobs_list, %{date: ~D[2018-12-19], title: "Dentist"})
+Todo.Server.Client.all(bobs_list)
+:erlang.system_info(:process_count)
+
+# System (supervisor) should restart Cache process
+cache_pid = Process.whereis(Todo.Cache)
+Process.exit(cache_pid, :kill)
+cache_pid = Process.whereis(Todo.Cache)
+bobs_list = Todo.Cache.Client.server_process("bobs_list")
+Todo.Server.Client.add_entry(bobs_list, %{date: ~D[2018-12-19], title: "Dentist"})
+Todo.Server.Client.all(bobs_list)
+:erlang.system_info(:process_count)
+
+# System (supervisor) should restart Cache process
+bobs_list = Todo.Cache.Client.server_process("bobs_list")
+Process.exit(bobs_list, :kill)
+bobs_list = Todo.Cache.Client.server_process("bobs_list")
+Todo.Server.Client.add_entry(bobs_list, %{date: ~D[2018-12-19], title: "Dentist"})
+Todo.Server.Client.all(bobs_list)
+:erlang.system_info(:process_count)
+
+# Database (supervisor) should restart Worker
+[{worker_pid, _}] = Registry.lookup(Todo.ProcessRegistry, {Todo.Database.Worker, 1})
+Process.exit(worker_pid, :kill)
+[{worker_pid, _}] = Registry.lookup(Todo.ProcessRegistry, {Todo.Database.Worker, 1})
+bobs_list = Todo.Cache.Client.server_process("bobs_list")
+Todo.Server.Client.add_entry(bobs_list, %{date: ~D[2018-12-19], title: "Dentist"})
+Todo.Server.Client.all(bobs_list)
+:erlang.system_info(:process_count)
+
+# Exceed default restart frequency
+Todo.System.start_link()
+
+for _ <- 1..4 do
+  Process.exit(Process.whereis(Todo.Cache), :kill)
+  Process.sleep(200)
+end

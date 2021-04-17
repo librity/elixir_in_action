@@ -32,17 +32,17 @@ Module attributes:
 - https://stackoverflow.com/questions/37713244/access-module-attributes-outside-the-module
 - https://elixir-lang.org/getting-started/module-attributes.html
 
-###
+### OTP-compliant processes
 
-```elixir
+- http://erlang.org/doc/design_principles/spec_proc.html#id80464
 
-```
+### Supervisor options
 
-###
-
-```elixir
-
-```
+- `Supervisor.terminate_child/2`
+- `GenServer.terminate/2`
+- `shutdown:` [`5000`, `:infinity` `:brutal_kill`]
+- `strategy:` [`:one_for_one`, `:one_for_all`, `:rest_for_one`]
+- `restart:` [`:temporary`, `:transient`]
 
 ###
 
