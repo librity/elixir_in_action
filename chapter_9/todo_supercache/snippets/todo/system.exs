@@ -15,7 +15,7 @@ Todo.Server.Client.add_entry(bobs_list, %{date: ~D[2018-12-19], title: "Dentist"
 Todo.Server.Client.all(bobs_list)
 :erlang.system_info(:process_count)
 
-# System (supervisor) should restart Cache process
+# Cache (supervisor) shouldn't restart todo server
 bobs_list = Todo.Cache.Client.server_process("bobs_list")
 Process.exit(bobs_list, :kill)
 bobs_list = Todo.Cache.Client.server_process("bobs_list")

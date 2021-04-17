@@ -1,14 +1,17 @@
 defmodule Todo.Server do
-  use GenServer
+  use GenServer, restart: :temporary
 
-  alias Todo.List
   alias Todo.Database.Client, as: DatabaseClient
+  alias Todo.List
+  alias Todo.ProcessRegistry
 
   def start_link(name) do
     IO.puts("Starting Todo.Server '#{name}'")
 
-    GenServer.start_link(Todo.Server, name)
+    GenServer.start_link(Todo.Server, name, name: via_tuple(name))
   end
+
+  defp via_tuple(name), do: ProcessRegistry.via_tuple({__MODULE__, name})
 
   @impl GenServer
   def init(name), do: {:ok, DatabaseClient.get(name) || List.new([], name)}

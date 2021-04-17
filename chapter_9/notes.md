@@ -44,6 +44,10 @@ Module attributes:
 - `strategy:` [`:one_for_one`, `:one_for_all`, `:rest_for_one`]
 - `restart:` [`:temporary`, `:transient`]
 
+### Dynamic Supervior
+
+- https://hexdocs.pm/elixir/DynamicSupervisor.html
+
 ###
 
 ```elixir

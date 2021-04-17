@@ -1,8 +1,9 @@
-{:ok, todo_server} = Todo.Server.Client.start()
-Todo.Server.Client.add_entry(todo_server, %{date: ~D[2018-12-19], title: "Dentist"})
-Todo.Server.Client.entries(todo_server, ~D[2018-12-19])
+Todo.start_link()
+{:ok, pid} = Todo.Server.Client.start_link("list1")
+Todo.Server.Client.add_entry(pid, %{date: ~D[2018-12-19], title: "Dentist"})
+Todo.Server.Client.entries(pid, ~D[2018-12-19])
 
-{:ok, pid} = Todo.Server.Client.start()
+{:ok, pid} = Todo.Server.Client.start_link("list2")
 Todo.Server.Client.add_entry(pid, %{date: ~D[2018-12-19], title: "Dentist"})
 Todo.Server.Client.add_entry(pid, %{date: ~D[2018-12-20], title: "Shopping"})
 Todo.Server.Client.add_entry(pid, %{date: ~D[2018-12-19], title: "Movies"})
