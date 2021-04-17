@@ -34,6 +34,27 @@ Application.started_applications()
 
 - Have no top-level supervisor.
 - http://erlang.org/doc/apps/stdlib/index.html
+- http://erlang.org/doc
+
+### Mix environments
+
+```bash
+MIX_ENV=prod mix compile
+MIX_ENV=prod iex -S mix
+mix test
+hexdump -C _build/prod/lib/todo/ebin/Elixir.Todo.Database.beam | less
+```
+
+```elixir
+System.get_env()
+System.get_env("MIX_ENV")
+```
+
+###
+
+```elixir
+
+```
 
 ###
 
