@@ -72,7 +72,7 @@ Agent.get(counter, fn count -> count end)
 
 - https://hexdocs.pm/elixir/Agent.html
 
-###
+### Erlang Term Storage tables
 
 ```elixir
 

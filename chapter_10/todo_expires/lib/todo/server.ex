@@ -1,52 +1,63 @@
 defmodule Todo.Server do
-  use Agent, restart: :temporary
+  use GenServer, restart: :temporary
 
   alias Todo.Database.Client, as: DatabaseClient
   alias Todo.List
   alias Todo.ProcessRegistry
 
-  def start_link(name) do
-    Agent.start_link(
-      fn ->
-        IO.puts("Starting Todo.Server '#{name}'")
+  @idle_timeout :timer.seconds(10)
 
-        DatabaseClient.get(name) || List.new([], name)
-      end,
-      name: via_tuple(name)
-    )
+  def start_link(name) do
+    IO.puts("Starting Todo.Server '#{name}'")
+
+    GenServer.start_link(Todo.Server, name, name: via_tuple(name))
   end
 
   defp via_tuple(name), do: ProcessRegistry.via_tuple({__MODULE__, name})
 
-  def all(pid), do: Agent.get(pid, fn todo -> List.all(todo) end)
+  @impl GenServer
+  def init(name), do: {:ok, DatabaseClient.get(name) || List.new([], name), @idle_timeout}
 
-  def by_date(pid, date), do: Agent.get(pid, fn todo -> List.by_date(todo, date) end)
+  @impl GenServer
+  def handle_call({:all}, _caller, todo), do: List.all(todo) |> refresh_call(todo)
 
-  def entries(pid, date), do: Agent.get(pid, fn todo -> List.entries(todo, date) end)
+  def handle_call({:by_date, date}, _caller, todo),
+    do: List.by_date(todo, date) |> refresh_call(todo)
 
-  def by_title(pid, title), do: Agent.get(pid, fn todo -> List.by_title(todo, title) end)
+  def handle_call({:entries, date}, _caller, todo),
+    do: List.entries(todo, date) |> refresh_call(todo)
 
-  def by_id(pid, id), do: Agent.get(pid, fn todo -> List.by_id(todo, id) end)
+  def handle_call({:by_title, title}, _caller, todo),
+    do: List.by_title(todo, title) |> refresh_call(todo)
 
-  def add_entry(pid, entry),
-    do: Agent.cast(pid, fn todo -> List.add_entry(todo, entry) |> persist!() end)
+  def handle_call({:by_id, id}, _caller, todo), do: List.by_id(todo, id) |> refresh_call(todo)
+  def handle_call(_bad_request, _caller, todo), do: :bad_request |> refresh_call(todo)
 
-  def update_entry(pid, entry),
-    do: Agent.cast(pid, fn todo -> List.update_entry(todo, entry) |> persist!() end)
+  defp refresh_call(response, todo), do: {:reply, response, todo, @idle_timeout}
 
-  def update_entry(pid, entry_id, updater_fun) do
-    Agent.cast(
-      pid,
-      fn todo -> List.update_entry(todo, entry_id, updater_fun) |> persist!() end
-    )
-  end
+  @impl GenServer
+  def handle_cast({:add_entry, entry}, todo), do: List.add_entry(todo, entry) |> persist!()
+  def handle_cast({:update_entry, entry}, todo), do: List.update_entry(todo, entry) |> persist!()
 
-  def delete_entry(pid, entry_id),
-    do: Agent.cast(pid, fn todo -> List.delete_entry(todo, entry_id) |> persist!() end)
+  def handle_cast({:update_entry, entry_id, updater_fun}, todo),
+    do: List.update_entry(todo, entry_id, updater_fun) |> persist!()
+
+  def handle_cast({:delete_entry, entry_id}, todo),
+    do: List.delete_entry(todo, entry_id) |> persist!()
+
+  def handle_cast(_bad_request, todo), do: refresh_cast(todo)
 
   defp persist!(%List{name: name} = todo) do
     DatabaseClient.store(name, todo)
 
-    todo
+    refresh_cast(todo)
+  end
+
+  defp refresh_cast(todo), do: {:noreply, todo, @idle_timeout}
+
+  def handle_info(:timeout, %List{name: name} = todo) do
+    IO.puts("Stopping Todo.Server '#{name}' due to inactivity")
+
+    {:stop, :normal, todo}
   end
 end
