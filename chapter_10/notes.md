@@ -168,15 +168,3 @@ todo_list = :ets.new(:todo_list, [:bag])
 
 - http://erlang.org/doc/man/dets.html
 - http://erlang.org/doc/apps/mnesia/users_guide.html
-
-###
-
-```elixir
-
-```
-
-###
-
-```elixir
-
-```

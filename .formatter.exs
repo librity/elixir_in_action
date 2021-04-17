@@ -1,4 +1,4 @@
 # Used by "mix format"
 [
-  inputs: ["./**/*.{ex,exs}"]
+  inputs: ["./*.{ex,exs}", "chapter_*/**/*.{ex,exs}"]
 ]
