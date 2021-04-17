@@ -11,11 +11,7 @@ defmodule Todo.Cache do
   end
 
   @impl GenServer
-  def init(_) do
-    DatabaseClient.start_link()
-
-    {:ok, %{}}
-  end
+  def init(_), do: {:ok, %{}}
 
   @impl GenServer
   def handle_call({:server_process, list_name}, _, todo_servers) do

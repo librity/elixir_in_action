@@ -6,15 +6,13 @@ defmodule Todo.Database.Client do
 
   def store(key, data) do
     key
-    |> choose_worker()
+    |> Database.choose_worker()
     |> WorkerClient.store(key, data)
   end
 
   def get(key) do
     key
-    |> choose_worker()
+    |> Database.choose_worker()
     |> WorkerClient.get(key)
   end
-
-  defp choose_worker(key), do: GenServer.call(Database, {:choose_worker, key})
 end
