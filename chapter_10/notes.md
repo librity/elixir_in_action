@@ -53,6 +53,36 @@ end)
 ```
 
 - `Task.start_link/1`
+- https://github.com/quantum-elixir/quantum-core
+
+### Agents
+
+```elixir
+{:ok, pid} = Agent.start_link(fn -> %{name: "Camilla Rhodes", age: 20} end)
+Agent.get(pid, fn state -> state.name end)
+Agent.update(pid, fn state -> %{state | age: state.age + 1} end)
+Agent.cast(pid, fn state -> %{state | age: state.age + 1} end)
+Agent.get(pid, fn state -> state end)
+
+{:ok, counter} = Agent.start_link(fn -> 0 end)
+spawn(fn -> Agent.update(counter, fn count -> count + 1 end) end)
+spawn(fn -> Agent.cast(counter, fn count -> count + 1 end) end)
+Agent.get(counter, fn count -> count end)
+```
+
+- https://hexdocs.pm/elixir/Agent.html
+
+###
+
+```elixir
+
+```
+
+###
+
+```elixir
+
+```
 
 ###
 
