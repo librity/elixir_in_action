@@ -2,10 +2,9 @@ defmodule Todo.Cache do
   use GenServer
 
   alias Todo.Server.Client, as: ServerClient
-  alias Todo.Database.Client, as: DatabaseClient
 
   def start_link(_) do
-    IO.puts("Starting todo cache.")
+    IO.puts("Starting Todo.Cache")
 
     GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end

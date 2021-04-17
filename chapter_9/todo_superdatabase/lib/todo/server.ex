@@ -5,7 +5,7 @@ defmodule Todo.Server do
   alias Todo.Database.Client, as: DatabaseClient
 
   def start_link(name) do
-    IO.puts("Starting todo list '#{name}' server.")
+    IO.puts("Starting Todo.Server '#{name}'")
 
     GenServer.start_link(Todo.Server, name)
   end

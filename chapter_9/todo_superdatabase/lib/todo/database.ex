@@ -1,12 +1,11 @@
 defmodule Todo.Database do
   alias Todo.Database.Worker
-  alias Todo.Database.Worker.Client, as: WorkerClient
 
   @db_folder "./persist"
   @pool_size 3
 
   def start_link do
-    IO.puts("Starting todo database.")
+    IO.puts("Starting Todo.Database")
     File.mkdir_p!(@db_folder)
 
     workers = Enum.map(1..@pool_size, &generate_worker_spec/1)

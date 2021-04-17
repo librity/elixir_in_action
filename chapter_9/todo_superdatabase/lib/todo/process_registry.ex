@@ -1,5 +1,9 @@
 defmodule Todo.ProcessRegistry do
-  def start_link, do: Registry.start_link(keys: :unique, name: __MODULE__)
+  def start_link do
+    IO.puts("Starting Todo.ProcessRegistry")
+
+    Registry.start_link(keys: :unique, name: __MODULE__)
+  end
 
   def via_tuple(key), do: {:via, Registry, {__MODULE__, key}}
 

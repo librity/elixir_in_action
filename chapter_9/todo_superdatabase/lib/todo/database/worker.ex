@@ -4,7 +4,7 @@ defmodule Todo.Database.Worker do
   alias Todo.ProcessRegistry
 
   def start_link({db_folder, worker_id}) do
-    IO.puts("Starting todo database worker ##{worker_id}.")
+    IO.puts("Starting Todo.Database.Worker ##{worker_id}")
 
     GenServer.start_link(__MODULE__, db_folder, name: via_tuple(worker_id))
   end
