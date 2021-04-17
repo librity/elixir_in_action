@@ -47,9 +47,4 @@ Module attributes:
 ### Dynamic Supervior
 
 - https://hexdocs.pm/elixir/DynamicSupervisor.html
-
-###
-
-```elixir
-
-```
+- erlang.org/download/armstrong_thesis_2003.pdf
