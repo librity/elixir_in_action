@@ -10,10 +10,12 @@ defmodule Todo.Web do
   def child_spec(_) do
     Plug.Adapters.Cowboy.child_spec(
       scheme: :http,
-      options: [port: 5454],
+      options: [port: fetch_port()],
       plug: __MODULE__
     )
   end
+
+  defp fetch_port, do: Application.fetch_env!(:todo, :http_port)
 
   get "/entries" do
     conn = Plug.Conn.fetch_query_params(conn)

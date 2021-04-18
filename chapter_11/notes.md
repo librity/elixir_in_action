@@ -36,20 +36,6 @@ Application.started_applications()
 - http://erlang.org/doc/apps/stdlib/index.html
 - http://erlang.org/doc
 
-### Mix environments
-
-```bash
-MIX_ENV=prod mix compile
-MIX_ENV=prod iex -S mix
-mix test
-hexdump -C _build/prod/lib/todo/ebin/Elixir.Todo.Database.beam | less
-```
-
-```elixir
-System.get_env()
-System.get_env("MIX_ENV")
-```
-
 ### `Poolboy` lib
 
 ```elixir
@@ -82,6 +68,25 @@ wrk -t12 -c400 -d30s "http://localhost:5454/entries?list=bob&date=2018-12-19"
 - https://github.com/elixir-plug/plug
 - https://github.com/wg/wrk
 - https://github.com/elixir-lang/gen_stage
+
+### Mix environments
+
+```bash
+MIX_ENV=prod mix compile
+MIX_ENV=prod iex -S mix
+mix test
+hexdump -C _build/prod/lib/todo/ebin/Elixir.Todo.Database.beam | less
+```
+
+```elixir
+System.get_env()
+System.get_env("MIX_ENV")
+
+Mix.env()
+
+Application.get_env(:todo, :http_port)
+Application.fetch_env!(:todo, :http_port)
+```
 
 ###
 
