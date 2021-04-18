@@ -2,11 +2,13 @@ defmodule Todo.Database do
   alias Todo.Database.Worker
   alias Todo.Database.Worker.Client, as: WorkerClient
 
-  @pool_size 3
-
   def child_spec(_) do
     IO.puts("Starting Todo.Database")
-    db_folder = fetch_db_folder()
+
+    config = fetch_config()
+    db_folder = Keyword.fetch!(config, :db_folder)
+    pool_size = Keyword.fetch!(config, :db_folder)
+
     File.mkdir_p!(db_folder)
 
     :poolboy.child_spec(
@@ -14,13 +16,13 @@ defmodule Todo.Database do
       [
         name: {:local, __MODULE__},
         worker_module: Worker,
-        size: @pool_size
+        size: pool_size
       ],
       [db_folder]
     )
   end
 
-  defp fetch_db_folder, do: Application.fetch_env!(:todo, :db_folder)
+  defp fetch_config, do: Application.fetch_env!(:todo, :database)
 
   def store(key, data) do
     :poolboy.transaction(

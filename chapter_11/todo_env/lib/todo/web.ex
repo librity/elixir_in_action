@@ -15,7 +15,7 @@ defmodule Todo.Web do
     )
   end
 
-  defp fetch_port, do: Application.fetch_env!(:todo, :http_port)
+  defp fetch_port, do: Application.fetch_env!(:todo, :port)
 
   get "/entries" do
     conn = Plug.Conn.fetch_query_params(conn)

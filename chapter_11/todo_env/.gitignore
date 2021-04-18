@@ -24,4 +24,4 @@ todo-*.tar
 
 # Temporary files for e.g. tests
 /tmp
-/persist
+/db/*

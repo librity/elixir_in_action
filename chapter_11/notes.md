@@ -88,8 +88,5 @@ Application.get_env(:todo, :http_port)
 Application.fetch_env!(:todo, :http_port)
 ```
 
-###
-
-```elixir
-
-```
+- https://elixirforum.com/t/running-code-after-all-exunit-tests-are-done/9937/6
+- https://hexdocs.pm/elixir/master/library-guidelines.html

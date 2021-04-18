@@ -5,8 +5,6 @@ defmodule Todo.Server do
   alias Todo.List
   alias Todo.ProcessRegistry
 
-  @idle_timeout :timer.seconds(10)
-
   def start_link(name) do
     IO.puts("Starting Todo.Server '#{name}'")
 
@@ -16,7 +14,8 @@ defmodule Todo.Server do
   defp via_tuple(name), do: ProcessRegistry.via_tuple({__MODULE__, name})
 
   @impl GenServer
-  def init(name), do: {:ok, DatabaseClient.get(name) || List.new([], name), @idle_timeout}
+  def init(name),
+    do: {:ok, DatabaseClient.get(name) || List.new([], name), fetch_idle_timeout()}
 
   @impl GenServer
   def handle_call({:all}, _caller, todo), do: List.all(todo) |> refresh_call(todo)
@@ -33,7 +32,7 @@ defmodule Todo.Server do
   def handle_call({:by_id, id}, _caller, todo), do: List.by_id(todo, id) |> refresh_call(todo)
   def handle_call(_bad_request, _caller, todo), do: :bad_request |> refresh_call(todo)
 
-  defp refresh_call(response, todo), do: {:reply, response, todo, @idle_timeout}
+  defp refresh_call(response, todo), do: {:reply, response, todo, fetch_idle_timeout()}
 
   @impl GenServer
   def handle_cast({:add_entry, entry}, todo), do: List.add_entry(todo, entry) |> persist!()
@@ -53,7 +52,7 @@ defmodule Todo.Server do
     refresh_cast(todo)
   end
 
-  defp refresh_cast(todo), do: {:noreply, todo, @idle_timeout}
+  defp refresh_cast(todo), do: {:noreply, todo, fetch_idle_timeout()}
 
   @impl GenServer
   def handle_info(:timeout, %List{name: name} = todo) do
@@ -61,4 +60,7 @@ defmodule Todo.Server do
 
     {:stop, :normal, todo}
   end
+
+  defp fetch_config, do: Application.fetch_env!(:todo, :server)
+  defp fetch_idle_timeout, do: fetch_config() |> Keyword.fetch!(:idle_timeout)
 end

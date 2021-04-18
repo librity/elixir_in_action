@@ -18,7 +18,7 @@ defmodule Todo.Cache.ClientTest do
       ServerClient.add_entry(alices_list, %{date: ~D[2018-12-19], title: "Dentist"})
       entries = ServerClient.entries(alices_list, ~D[2018-12-19])
 
-      assert [%Entry{date: ~D[2018-12-19], id: 1, title: "Dentist"} | _tails] = entries
+      assert [%Entry{date: ~D[2018-12-19], id: 1, title: "Dentist"}] = entries
     end
   end
 end
