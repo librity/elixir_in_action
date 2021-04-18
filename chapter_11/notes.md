@@ -63,6 +63,26 @@ Process.list()
 - https://hex.pm/
 - https://hexdocs.pm/mix/Mix.Tasks.Deps.html
 
+### OTP `observer`
+
+```elixir
+Todo.Cache.Client.server_process("Bob")
+Todo.Cache.Client.server_process("Alice")
+:observer.start()
+```
+
+### `Cowboy` & `Plug`
+
+```bash
+wrk -t12 -c400 -d30s "http://localhost:5454/add_entry?list=bob&date=2018-12-19&title=Dentist"
+wrk -t12 -c400 -d30s "http://localhost:5454/entries?list=bob&date=2018-12-19"
+```
+
+- https://github.com/ninenines/cowboy
+- https://github.com/elixir-plug/plug
+- https://github.com/wg/wrk
+- https://github.com/elixir-lang/gen_stage
+
 ###
 
 ```elixir
