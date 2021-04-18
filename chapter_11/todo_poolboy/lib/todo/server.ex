@@ -55,6 +55,7 @@ defmodule Todo.Server do
 
   defp refresh_cast(todo), do: {:noreply, todo, @idle_timeout}
 
+  @impl GenServer
   def handle_info(:timeout, %List{name: name} = todo) do
     IO.puts("Stopping Todo.Server '#{name}' due to inactivity")
 

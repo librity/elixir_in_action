@@ -50,11 +50,18 @@ System.get_env()
 System.get_env("MIX_ENV")
 ```
 
-###
+### `Poolboy` lib
 
 ```elixir
-
+self() |> Process.info()
+Process.get()
+Process.list()
 ```
+
+- https://github.com/devinus/poolboy
+- https://hexdocs.pm/elixir/Version.html#module-requirements
+- https://hex.pm/
+- https://hexdocs.pm/mix/Mix.Tasks.Deps.html
 
 ###
 

@@ -1,28 +1,36 @@
 defmodule Todo.Database do
   alias Todo.Database.Worker
+  alias Todo.Database.Worker.Client, as: WorkerClient
 
   @db_folder "./persist"
   @pool_size 3
 
-  def start_link do
+  def child_spec(_) do
     IO.puts("Starting Todo.Database")
     File.mkdir_p!(@db_folder)
 
-    workers = Enum.map(1..@pool_size, &generate_worker_spec/1)
-    Supervisor.start_link(workers, strategy: :one_for_one)
+    :poolboy.child_spec(
+      __MODULE__,
+      [
+        name: {:local, __MODULE__},
+        worker_module: Worker,
+        size: @pool_size
+      ],
+      [@db_folder]
+    )
   end
 
-  defp generate_worker_spec(worker_id) do
-    {Worker, {@db_folder, worker_id}}
-    |> Supervisor.child_spec(id: worker_id)
+  def store(key, data) do
+    :poolboy.transaction(
+      __MODULE__,
+      fn worker_pid -> WorkerClient.store(worker_pid, key, data) end
+    )
   end
 
-  def child_spec(_),
-    do: %{
-      id: __MODULE__,
-      start: {__MODULE__, :start_link, []},
-      type: :supervisor
-    }
-
-  def choose_worker(key), do: :erlang.phash2(key, @pool_size) + 1
+  def get(key) do
+    :poolboy.transaction(
+      __MODULE__,
+      fn worker_pid -> WorkerClient.get(worker_pid, key) end
+    )
+  end
 end
