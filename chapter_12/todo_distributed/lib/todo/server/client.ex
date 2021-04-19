@@ -3,6 +3,13 @@ defmodule Todo.Server.Client do
 
   defdelegate start_link(params), to: Server
 
+  def where_is(name) do
+    case :global.whereis_name({Server, name}) do
+      :undefined -> nil
+      pid -> pid
+    end
+  end
+
   def all(pid), do: GenServer.call(pid, {:all})
   def by_date(pid, date), do: GenServer.call(pid, {:by_date, date})
   def entries(pid, date), do: GenServer.call(pid, {:entries, date})

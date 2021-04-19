@@ -7,7 +7,7 @@ defmodule Todo.Database do
 
     config = fetch_config()
     db_folder = Keyword.fetch!(config, :db_folder)
-    pool_size = Keyword.fetch!(config, :db_folder)
+    pool_size = Keyword.fetch!(config, :pool_size)
 
     File.mkdir_p!(db_folder)
 

@@ -168,11 +168,33 @@ end
 - http://erlang.org/doc/man/global.html#trans-2
 - `:global.trans/2`
 
-###
+### Optimizing distributed process discovery
 
 ```elixir
+# Works well as long as the number of nodes stay constant
+def node_for_list(list_name) do
+  all_sorted_nodes = Enum.sort(Node.list([:this, :visible]))
 
+  node_index =
+    :erlang.phash2(
+      todo_list_name,
+      length(all_sorted_nodes)
+    )
+
+  Enum.at(all_sorted_nodes, node_index)
+end
+
+:rpc.call(
+  node_for_list(list_name),
+  Todo.Cache,
+  :server_process,
+  [list_name]
+)
 ```
+
+- https://en.wikipedia.org/wiki/Consistent_hashing
+- https://github.com/ostinelli/syn
+- https://github.com/bitwalker/swarm
 
 ###
 
