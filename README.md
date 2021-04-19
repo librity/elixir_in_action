@@ -18,3 +18,11 @@ Path.wildcard("{chapter_*}/**/*.{ex,exs}") |> Enum.count()
 
 - https://hexdocs.pm/mix/master/Mix.Tasks.Format.html
 - https://hexdocs.pm/elixir/master/Path.html#wildcard/2
+
+## Concepts <a name = "concepts"></a>
+
+### Concurrency vs. Parallelism
+
+<p>
+  <img src=".github/concurrency_vs_parallelism.svg"/>
+</p>
