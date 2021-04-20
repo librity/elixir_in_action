@@ -126,7 +126,7 @@ iex(node2@localhost)12> :pg2.get_members({:todo_list, "bob"})
 [#PID<0.90.0>, #PID<7954.90.0>]
 ```
 
-- `GenServer.multi_call/4`
+- `:rpc.multi_call/4` (ModuleFunctionArguments + timeout)
 - `:pg2.get_closest_pid/1`
 - http://erlang.org/doc/man/pg2.html
 
@@ -196,14 +196,104 @@ end
 - https://github.com/ostinelli/syn
 - https://github.com/bitwalker/swarm
 
-###
+### Starting multiple todo instances
 
-```elixir
-
+```bash
+iex --sname node1@localhost -S mix
+iex --erl "-todo port 5555" --sname node2@localhost -S mix
 ```
 
-###
+```elixir
+Node.connect(:node1@localhost)
+```
+
+### Detecting partitions
+
+```bash
+iex --sname node1@localhost
+iex --sname node2@localhost
+iex --sname node3@localhost
+```
 
 ```elixir
+iex(node1@localhost)1> :net_kernel.monitor_nodes(true)
+iex(node2@localhost)1> Node.connect(:node1@localhost)
+iex(node3@localhost)1> Node.connect(:node1@localhost)
 
+iex(node1@localhost)2> flush()
+{:nodeup, :node2@localhost}
+{:nodeup, :node3@localhost}
+
+# Kill node1 and node2
+iex(node1@localhost)3> flush()
+{:nodedown, :node3@localhost}
+{:nodedown, :node2@localhost}
 ```
+
+- `:net_kernel.monitor_nodes/1`
+- http://erlang.org/doc/man/net_kernel.html#monitor_nodes-1
+- https://hexdocs.pm/elixir/Node.html#monitor/2
+
+### Node names
+
+```bash
+iex --name node1@127.0.0.1
+iex --name node2@some_host.some_domain
+```
+
+### Cookies
+
+```elixir
+iex(node1@localhost)1> Node.get_cookie()
+:JHSKSHDYEJHDKEDKDIEN
+
+iex(node1@localhost)1> Node.set_cookie(:some_cookie)
+iex(node1@localhost)2> Node.get_cookie()
+:some_cookie
+```
+
+```elixir
+# iex --sname node1@localhost --cookie another_cookie
+iex(node1@localhost)1> Node.get_cookie()
+:another_cookie
+```
+
+### Hidden nodes
+
+```bash
+iex --sname node1@localhost
+iex --hidden --sname node2@localhost
+```
+
+```elixir
+iex(node2@localhost)2> Node.connect(:node1@localhost)
+true
+
+iex(node1@localhost)1> Node.list([:hidden])
+[:node2@localhost]
+iex(node1@localhost)2> Node.list([:connected])
+[:node2@localhost]
+iex(node1@localhost)3> Node.list([:visible])
+[]
+```
+
+### Node listening ports
+
+```bash
+# Set the min and max port number
+# that instance chooses to listen for node connections
+iex \
+--erl '-kernel inet_dist_listen_min 10000' \
+--erl '-kernel inet_dist_listen_max 10100' \
+-sname node2@localhost
+
+epmd -names
+```
+
+```elixir
+# Get all nodes and their respective listening ports
+iex(node2@localhost)3> :net_adm.names()
+{:ok, [{'node1', 43735}, {'node2', 10000}]}
+```
+
+- http://erlang.org/doc/apps/ssl/ssl_distribution.html
